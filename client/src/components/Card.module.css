@@ -1,0 +1,28 @@
+.card {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  width: 200px;
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.info {
+  padding: 10px;
+}
+
+.name {
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+}
+
+.genres {
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
