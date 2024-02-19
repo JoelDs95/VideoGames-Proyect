@@ -1,29 +1,9 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { createGame } from "../redux/actions";
+import genresData from "./common/genresData";
 import styles from "./FormCreate.module.css";
 
-const genresData = [
-  { id: 4, name: "Action" },
-  { id: 51, name: "Indie" },
-  { id: 3, name: "Adventure" },
-  { id: 5, name: "RPG" },
-  { id: 10, name: "Strategy" },
-  { id: 2, name: "Shooter" },
-  { id: 40, name: "Casual" },
-  { id: 14, name: "Simulation" },
-  { id: 7, name: "Puzzle" },
-  { id: 11, name: "Arcade" },
-  { id: 83, name: "Platformer" },
-  { id: 59, name: "Massively Multiplayer" },
-  { id: 15, name: "Sports" },
-  { id: 1, name: "Racing" },
-  { id: 19, name: "Family" },
-  { id: 28, name: "Board Games" },
-  { id: 34, name: "Educational" },
-  { id: 17, name: "Card" },
-  { id: 6, name: "Fighting" }
-];
 
 const FormCreate = () => {
   const [selectedGenres, setSelectedGenres] = useState([]);
@@ -66,7 +46,7 @@ const FormCreate = () => {
 
   return (
     <div className={styles.formContainer}>
-      <h2>Crear Nuevo Videojuego</h2>
+      
       <div className={styles.formGroup}>
         <label>Nombre:</label>
         <input

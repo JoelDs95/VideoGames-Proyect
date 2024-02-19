@@ -1,9 +1,11 @@
 import axios from 'axios';
 
 // Action para obtener todos los videojuegos
-export const getVideoGames = () => async (dispatch) => {
+export const getVideoGames = (currentPage, pageSize, searchTerm = '' ) => async (dispatch) => {
   try {
-    const response = await axios.get('/videogames');
+    const startIndex = (currentPage - 1) * pageSize;
+    const url = `/videogames?_start=${startIndex}&_limit=${pageSize}&name_like=${searchTerm}`;
+    const response = await axios.get(url);
     dispatch({ type: 'GET_VIDEOGAMES', payload: response.data });
   } catch (error) {
     console.error('Error fetching video games:', error);

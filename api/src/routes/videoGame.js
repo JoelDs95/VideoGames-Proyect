@@ -74,27 +74,6 @@ router.get('/name', async (req, res) => {
     const { query } = req.query;
     const searchQuery = query.toLowerCase();
 
-    // Comentar o eliminar la siguiente sección que consulta en la base de datos
-    /*
-    const dbGame = await VideoGame.findOne({
-      where: { name: searchQuery },
-    });
-
-    if (dbGame) {
-      // Si se encuentra en la base de datos, agregarlo a los resultados
-      apiGames.unshift({
-        id: dbGame.id,
-        name: dbGame.name,
-        description: dbGame.description,
-        platforms: dbGame.platforms,
-        image: dbGame.image,
-        released: dbGame.release,
-        rating: dbGame.rating,
-      });
-    }
-    */
-
-    // Consultar directamente a la API
     const apiResults = await axios.get(
       `${RAWG_BASE_URL}/games?key=${RAWG_API_KEY}&search=${searchQuery}`
     );

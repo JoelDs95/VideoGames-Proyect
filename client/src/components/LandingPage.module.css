@@ -1,15 +1,30 @@
 .LandingPage {
-    width: 100%;
-    height: 100vh; /* La mitad de la altura de la pantalla */
-    border: none;
-    background-image: url('https://pro-assets.morningconsult.com/wp-uploads/2021/11/04170352/211104_Gaming-Series_Story-3_Subscription-Services_FI.gif');
-    background-size: cover;
-    background-position: center;
-    color: rgb(206, 22, 22);
-    font-size: 40px;
-    font-family: 'Pixel Font'; /* Agrega la fuente pixelada */
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+  width: 100%;
+  height: 100vh;
+  border: none;
+  background-image: url('https://img.freepik.com/vector-gratis/photocall-juegos-neon-dibujado-mano_23-2149860761.jpg');
+  background-size: contain;
+  background-position: center;
+  color: rgb(206, 22, 22);
+  font-size: 40px;
+  font-family: 'Pixel Font';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.LandingPageButton {
+  padding: 10px 20px; 
+  background-color: #5e1da8; /* Color de fondo del botón */
+  color: white; 
+  border: none; 
+  border-radius: 5px;
+  font-size: 20px; 
+  font-weight: bold; 
+  /* cursor: pointer; */
+  transition: background-color 0.3s;
+}
+
+.LandingPageButton:hover {
+  background-color: #8933a3;
+}
