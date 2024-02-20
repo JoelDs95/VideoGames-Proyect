@@ -22,7 +22,7 @@ export const getVideoGameByName = (name) => async (dispatch) => {
   }
 };
 
-// Action para obtener los géneros
+// Action para obtener los géneros APO
 export const getGenres = () => async (dispatch) => {
   try {
     const response = await axios.get('/genres');
@@ -30,6 +30,18 @@ export const getGenres = () => async (dispatch) => {
   } catch (error) {
     console.error('Error fetching genres:', error);
   }
+};
+// Action para obtener los géneros DB
+export const fetchGenres = () => {
+  return async (dispatch) => {
+    try {
+      const response = await fetch('/genres');
+      const data = await response.json();
+      dispatch({ type: 'FETCH_GENRES_SUCCESS', payload: data });
+    } catch (error) {
+      dispatch({ type: 'FETCH_GENRES_FAILURE', payload: error.message });
+    }
+  };
 };
 
 export const getDetails = (id) => async (dispatch) => {
@@ -46,12 +58,11 @@ export const createGame = (gameData) => {
     try {
       const response = await axios.post('/videogames', gameData);
       const newGame = response.data.videogame;
-      // Aquí podrías despachar otra acción si lo necesitas, por ejemplo para actualizar el estado de tu aplicación
-      // dispatch(gameCreated(newGame));
-      return newGame; // Puedes devolver el nuevo juego creado si lo necesitas en el componente
+      
+      return newGame;
     } catch (error) {
       console.error('Error al crear el juego:', error);
-      throw error; // Puedes manejar el error en el componente que llama a esta acción
+      throw error;
     }
   };
 };

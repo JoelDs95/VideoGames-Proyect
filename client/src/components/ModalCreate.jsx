@@ -1,7 +1,6 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { createGame } from "../redux/actions";
-import genresData from "./common/genresData";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { createGame, fetchGenres } from "../redux/actions";
 import styles from "./ModalCreate.module.css"; // Importa los estilos del modal
 
 const ModalCreate = ({ isOpen, closeModal }) => {
@@ -11,9 +10,22 @@ const ModalCreate = ({ isOpen, closeModal }) => {
   const [description, setDescription] = useState("");
   const [platforms, setPlatforms] = useState("");
   const [image, setImage] = useState("");
-  const [release, setRelease] = useState("");
+  const [released, setReleased] = useState("");
   const [rating, setRating] = useState("");
   const dispatch = useDispatch();
+  const genres = useSelector((state) => state.genres);
+
+  const [nameError, setNameError] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
+  const [imageError, setImageError] = useState("");
+  const [releasedError, setReleasedError] = useState("");
+  const [ratingError, setRatingError] = useState("");
+  const [genreError, setGenreError] = useState("");
+  const [platformError, setPlatformError] = useState("");
+
+  useEffect(() => {
+    dispatch(fetchGenres());
+  }, [dispatch]);
 
   const toggleGenre = (genre) => {
     const index = selectedGenres.findIndex((g) => g.id === genre.id);
@@ -25,13 +37,55 @@ const ModalCreate = ({ isOpen, closeModal }) => {
   };
 
   const handleSubmit = async () => {
+    setNameError("");
+    setDescriptionError("");
+    setImageError("");
+    setReleasedError("");
+    setRatingError("");
+    setGenreError("");
+    setPlatformError("");
+    let hasErrors = false;
+    if (name.trim() === "") {
+      setNameError("El nombre es obligatorio");
+      hasErrors = true;
+    }
+    if (name.length > 18) {
+      setNameError("El nombre no puede tener más de 18 caracteres");
+      hasErrors = true;
+    }
+    if (description.length > 250) {
+      setDescriptionError("La descripción no puede tener más de 250 caracteres");
+      hasErrors = true;
+    }
+    if (platforms.trim() === "") {
+      setPlatformError("La plataforma es obligatoria");
+      hasErrors = true;
+    }
+    if (!image.startsWith("https://")) {
+      setImageError("La URL de la imagen debe empezar con 'https://'");
+      hasErrors = true;
+    }if (new Date(released) > new Date()) {
+      setReleasedError("La fecha de lanzamiento no puede ser en el futuro");
+      hasErrors = true;
+    }
+    if (parseFloat(rating) > 5 || isNaN(parseFloat(rating))) {
+      setRatingError("El rating debe ser un número entre 0 y 5");
+      hasErrors = true;
+    }
+    if (selectedGenres.length === 0) {
+      setGenreError("Debe seleccionar al menos un género");
+      hasErrors = true;
+    }
+    if (hasErrors) {
+      return;
+    }
     try {
       const gameData = {
         name,
         description,
         platforms,
         image,
-        release,
+        released,
         rating,
         genres: selectedGenres.map((genre) => genre.id),
       };
@@ -39,7 +93,7 @@ const ModalCreate = ({ isOpen, closeModal }) => {
       closeModal(); // Cierra el modal después de enviar el formulario
     } catch (error) {
       console.error("Error al enviar formulario:", error);
-      // Aquí podrías mostrar un mensaje de error al usuario
+      alert("Error al enviar formulario");
     }
   };
 
@@ -58,6 +112,7 @@ const ModalCreate = ({ isOpen, closeModal }) => {
                   onChange={(e) => setName(e.target.value)}
                   className={styles.input}
                 />
+                {nameError && <p className={styles.error}>{nameError}</p>}
               </div>
               <div className={styles.formGroup}>
                 <label>Descripción:</label>
@@ -66,6 +121,7 @@ const ModalCreate = ({ isOpen, closeModal }) => {
                   onChange={(e) => setDescription(e.target.value)}
                   className={styles.input}
                 />
+                {descriptionError && <p className={styles.error}>{descriptionError}</p>}
               </div>
               <div className={styles.formGroup}>
                 <label>Plataformas:</label>
@@ -75,6 +131,7 @@ const ModalCreate = ({ isOpen, closeModal }) => {
                   onChange={(e) => setPlatforms(e.target.value)}
                   className={styles.input}
                 />
+                {platformError && <p className={styles.error}>{platformError}</p>}
               </div>
               <div className={styles.formGroup}>
                 <label>Imagen:</label>
@@ -84,6 +141,7 @@ const ModalCreate = ({ isOpen, closeModal }) => {
                   onChange={(e) => setImage(e.target.value)}
                   className={styles.input}
                 />
+                {imageError && <p className={styles.error}>{imageError}</p>}
                 <br />
                 <br />
                 {image && (
@@ -95,27 +153,6 @@ const ModalCreate = ({ isOpen, closeModal }) => {
                 )}
               </div>
               <div className={styles.formGroup}>
-                <div className={styles.inputContainer}>
-                  <label>Fecha de Lanzamiento:</label>
-                  <input
-                    type="date"
-                    value={release}
-                    onChange={(e) => setRelease(e.target.value)}
-                    className={styles.inputDate}
-                  />
-                </div>
-                <div className={styles.inputContainer}>
-                  <label>Rating:</label>
-                  <input
-                    type="number"
-                    value={rating}
-                    onChange={(e) => setRating(e.target.value)}
-                    className={styles.inputDate}
-                  />
-                </div>
-              </div>
-
-              <div className={styles.formGroup}>
                 <label>Géneros:</label>
                 <div className={styles.multiselect}>
                   <input
@@ -125,9 +162,10 @@ const ModalCreate = ({ isOpen, closeModal }) => {
                     onClick={() => setShowGenreList(!showGenreList)}
                     className={styles.selectedGenres}
                   />
+                  {genreError && <p className={styles.error}>{genreError}</p>}
                   {showGenreList && (
                     <ul className={styles.genreList}>
-                      {genresData.map((genre) => (
+                      {genres.map((genre) => (
                         <li
                           key={genre.id}
                           className={
@@ -142,6 +180,28 @@ const ModalCreate = ({ isOpen, closeModal }) => {
                       ))}
                     </ul>
                   )}
+                </div>
+              </div>
+              <div className={styles.formGroup}>
+                <div className={styles.inputContainer}>
+                  <label>Fecha de Lanzamiento:</label>
+                  <input
+                    type="date"
+                    value={released}
+                    onChange={(e) => setReleased(e.target.value)}
+                    className={styles.inputDate}
+                  />
+                  {releasedError && <p className={styles.error}>{releasedError}</p>}
+                </div>
+                <div className={styles.inputContainer}>
+                  <label>Rating:</label>
+                  <input
+                    type="number"
+                    value={rating}
+                    onChange={(e) => setRating(e.target.value)}
+                    className={styles.inputDate}
+                  />
+                  {ratingError && <p className={styles.error}>{ratingError}</p>}
                 </div>
               </div>
               <button onClick={handleSubmit} className={styles.submitButton}>

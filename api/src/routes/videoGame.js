@@ -2,6 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const { Videogame, Genre } = require('../db');
 const router = express.Router();
+const { Op } = require('sequelize');
 
 const RAWG_API_KEY = process.env.API_KEY;
 const RAWG_BASE_URL = 'https://api.rawg.io/api';
@@ -11,22 +12,36 @@ let videogamesCache = null;
 
 router.get('/', async (req, res) => {
   try {
-    // Verificar si la información está en el caché
-    if (videogamesCache) {
+    let formattedVideoGamesDB;
+
+    const videoGamesDB = await Videogame.findAll({
+      include: [{
+        model: Genre,
+        attributes: ['name'],
+        through: { attributes: [] }
+      }]
+    });
+
+    formattedVideoGamesDB = videoGamesDB.map(game => {
+      const genres = game.genres.map(genre => genre.name);
+      return { ...game.toJSON(), genres };
+    });
+
+    // Comprobar si hay datos en el caché
+    if (videogamesCache && videogamesCache.length > 0) {
       console.log('Obteniendo datos desde el caché...');
-      return res.json(videogamesCache);
+      const combinedVideoGames = [...formattedVideoGamesDB, ...videogamesCache];
+      return res.json(combinedVideoGames);
     }
 
     const totalPages = 50;
     const batchSize = 10;
-    const allVideogames = [];
+    const allVideoGames = [];
 
     // Bucle para recorrer en lotes de 10 páginas
     for (let batch = 0; batch < totalPages / batchSize; batch++) {
       const pageStart = batch * batchSize + 1;
       const pageEnd = (batch + 1) * batchSize;
-
-      // Hacer peticiones a la API para cada página del lote
       const requests = [];
 
       for (let page = pageStart; page <= pageEnd; page++) {
@@ -34,7 +49,6 @@ router.get('/', async (req, res) => {
         requests.push(axios.get(url));
       }
 
-      // Esperar a que todas las peticiones se completen
       const responses = await Promise.all(requests);
 
       // Procesar las respuestas y extraer los datos necesarios
@@ -50,19 +64,18 @@ router.get('/', async (req, res) => {
             released: result.released,
             rating: result.rating,
             screenshots: result.short_screenshots.map(screen => screen.image)
-           
-
           };
         });
 
-        allVideogames.push(...videogames);
+        allVideoGames.push(...videogames);
       });
     }
 
-    // Guardar en el caché para futuras consultas
-    videogamesCache = allVideogames;
+    // Guardar en caché
+    videogamesCache = allVideoGames;
 
-    res.json(allVideogames);
+    const combinedVideoGames = [...formattedVideoGamesDB, ...allVideoGames];
+    res.json(combinedVideoGames);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error interno del servidor' });
@@ -74,24 +87,52 @@ router.get('/name', async (req, res) => {
     const { query } = req.query;
     const searchQuery = query.toLowerCase();
 
-    const apiResults = await axios.get(
-      `${RAWG_BASE_URL}/games?key=${RAWG_API_KEY}&search=${searchQuery}`
-    );
+    const regexQuery = `^${searchQuery}$`; // Expresión regular para coincidencia exacta
 
-    const apiGames = apiResults.data.results.map((result) => {
-      return {
-        id: result.id,
-        name: result.name,
-        description: result.description,
-        platforms: result.platforms.map((platform) => platform.platform.name),
-        image: result.background_image,
-        released: result.released,
-        rating: result.rating,
-      };
+    const dbResults = await Videogame.findAll({
+      where: {
+        name: {
+          [Op.regexp]: regexQuery
+        }
+      },
+      include: {
+        model: Genre,
+        attributes: ['name'],
+        through: { attributes: [] } 
+      },
+      limit: 15
+    });
+    const formattedDbResults = dbResults.map(game => {
+      const genres = game.genres.map(genre => genre.name);
+      return { ...game.toJSON(), genres };
     });
 
-    // Devolver los primeros 15 resultados
-    res.json(apiGames.slice(0, 15));
+    // Paso 2: Consulta a la API externa si no se encuentran suficientes resultados en la base de datos
+    let combinedResults = formattedDbResults;
+
+    if (formattedDbResults.length < 15) {
+      const apiResults = await axios.get(
+        `${RAWG_BASE_URL}/games?key=${RAWG_API_KEY}&search=${searchQuery}`
+      );
+
+      const apiGames = apiResults.data.results.map((result) => {
+        return {
+          id: result.id,
+          name: result.name,
+          description: result.description,
+          platforms: result.platforms ? result.platforms.map((platform) => platform.platform.name) : [],
+          image: result.background_image,
+          released: result.released,
+          rating: result.rating,
+        };
+      });
+
+      // Combina los resultados de la base de datos y la API externa
+      combinedResults = [...formattedDbResults, ...apiGames.slice(0, 15 - formattedDbResults.length)];
+    }
+
+    // Paso 3: Devuelve los resultados combinados al cliente
+    res.json(combinedResults);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error interno del servidor' });
@@ -118,18 +159,17 @@ router.get('/:idVideogame', async (req, res) => {
     });
 
     if (dbVideogame) {
-      console.log('Obteniendo detalle del videojuego desde la base de datos...');
-      return res.json({
-        id: dbVideogame.id,
-        name: dbVideogame.name,
-        description: dbVideogame.description,
-        platforms: dbVideogame.platforms,
-        image: dbVideogame.image,
-        released: dbVideogame.released,
-        rating: dbVideogame.rating,
-        genres: dbVideogame.Genres,
-        
-      });
+      console.log('Obteniendo detalle del videojuego desde la base de datos...', dbVideogame);
+      const genres = dbVideogame.genres.map(genre => genre.name);
+      const platforms = Array.isArray(dbVideogame.platforms) ? dbVideogame.platforms : [dbVideogame.platforms];
+      const formattedDate = dbVideogame.released.toISOString().substring(0, 10);
+      const formattedDbResult = {
+        ...dbVideogame.toJSON(),
+        genres,
+        platforms,
+        released: formattedDate,
+      };
+      return res.json(formattedDbResult);
     }
 
     // Si no está en la base de datos, consultarlo a la API
@@ -159,7 +199,7 @@ router.get('/:idVideogame', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     // Extraer datos del cuerpo de la solicitud
-    const { name, description, platforms, image, release, rating, genres } = req.body;
+    const { name, description, platforms, image, released, rating, genres } = req.body;
 
     // Validar que se proporcionen al menos un género
     if (!genres || genres.length === 0) {
@@ -172,7 +212,7 @@ router.post('/', async (req, res) => {
       description,
       platforms,
       image,
-      release,
+      released,
       rating,
     });
 
@@ -189,6 +229,5 @@ router.post('/', async (req, res) => {
     res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
-// ... Otras rutas
 
 module.exports = router;

@@ -18,14 +18,14 @@ module.exports = (sequelize) => {
       allowNull: true,
     },
     platforms: {
-      type: DataTypes.STRING, // Puedes ajustar el tipo de datos según tus necesidades
+      type: DataTypes.STRING,
       allowNull: false,
     },
     image: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    release: {
+    released: {
       type: DataTypes.DATE,
       allowNull: true,
     },

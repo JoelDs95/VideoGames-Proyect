@@ -89,14 +89,6 @@ function rootReducer(state = initialState, action) {
         detail: {} // O alguna otra lógica de manejo de errores
       };
 
-    case 'GET_PLATFORMS':
-      return {
-        ...state,
-        platforms: action.payload
-      };
-
-    // Agrega casos para otras acciones según sea necesario
-
     default:
       return state;
   }

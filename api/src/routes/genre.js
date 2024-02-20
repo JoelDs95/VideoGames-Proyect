@@ -36,5 +36,16 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
+router.get('/genres', async (req, res) => {
+  try {
+    const genres = await Genre.findAll({ attributes: ['id', 'name'] });
+    res.json(genres);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Hubo un error al obtener los géneros.' });
+  }
+});
+
+
 
 module.exports = router;

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from 'react-router-dom';
 import { getDetails } from "../redux/actions";
 import styles from "./Detail.module.css";
 
@@ -8,6 +9,7 @@ const Detail = ({ match }) => {
   const dispatch = useDispatch();
   const { id } = match.params;
   const details = useSelector((state) => state.detail);
+  const history = useHistory();
 
   useEffect(() => {
     dispatch(getDetails(id));
@@ -21,12 +23,21 @@ const Detail = ({ match }) => {
     return <div>Error: {details.error}</div>;
   }
 
+  const handleGoBack = () => {
+  history.push({
+    pathname: '/home', 
+    state: { fromDetail: true },
+  });
+};
   const backgroundImageStyle = {
     height: "calc(100vh - 20px)", // Altura de la ventana menos la altura de la barra de navegación (70px)
     backgroundImage: `linear-gradient(to bottom, rgba(150, 16, 16, 0), rgba(21, 21, 21)), linear-gradient(to bottom, rgba(21, 21, 21, 0.8), rgba(21, 21, 21, 0.5)), url(${details.image})`,
   };
   return (
+    
     <div className={styles.page__art} style={backgroundImageStyle}>
+      {/* Aquí va el contenido del detalle */}
+      <button className={styles.returnButton} onClick={handleGoBack}>Home</button>
       {" "}
       {/* Aplica la clase de estilo y los estilos de fondo */}
       <div
