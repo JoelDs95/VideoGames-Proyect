@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Link } from "react-router-dom"; // Importa Link desde react-router-dom
+import { Link } from "react-router-dom";
 import SearchBar from "./common/SearchBar";
 import styles from "./NavBar.module.css";
 import Modal from './ModalCreate';

@@ -1,28 +1,27 @@
 import axios from 'axios';
 
-// Action para obtener todos los videojuegos
-export const getVideoGames = (currentPage, pageSize, searchTerm = '' ) => async (dispatch) => {
+//obtener los videojuegos
+export const getVideoGames = () => async (dispatch) => {
   try {
-    const startIndex = (currentPage - 1) * pageSize;
-    const url = `/videogames?_start=${startIndex}&_limit=${pageSize}&name_like=${searchTerm}`;
+    const url = `/videogames`;
     const response = await axios.get(url);
     dispatch({ type: 'GET_VIDEOGAMES', payload: response.data });
   } catch (error) {
     console.error('Error fetching video games:', error);
   }
 };
-
-// Action para obtener un videojuego por su nombre
+//obtener nombre
 export const getVideoGameByName = (name) => async (dispatch) => {
   try {
-    const response = await axios.get(`/videogames/name?query=${name}`);
+    const url = `/videogames/name?query=${name}`;
+    const response = await axios.get(url);
     dispatch({ type: 'GET_VIDEOGAME_NAME', payload: response.data });
   } catch (error) {
     console.error('Error fetching video game by name:', error);
   }
 };
 
-// Action para obtener los géneros APO
+//géneros APO
 export const getGenres = () => async (dispatch) => {
   try {
     const response = await axios.get('/genres');
@@ -35,9 +34,9 @@ export const getGenres = () => async (dispatch) => {
 export const fetchGenres = () => {
   return async (dispatch) => {
     try {
-      const response = await fetch('/genres');
+      const response = await fetch('/genresDb');
       const data = await response.json();
-      dispatch({ type: 'FETCH_GENRES_SUCCESS', payload: data });
+      dispatch({ type: "GET_GENRES", payload: data });
     } catch (error) {
       dispatch({ type: 'FETCH_GENRES_FAILURE', payload: error.message });
     }
@@ -47,19 +46,19 @@ export const fetchGenres = () => {
 export const getDetails = (id) => async (dispatch) => {
   try {
     const response = await axios.get(`/videogames/${id}`);
-    dispatch({ type: 'GET_DETAILS_SUCCESS', payload: response.data });
+    dispatch({ type: 'GET_DETAILS', payload: response.data });
   } catch (error) {
     console.error('Error fetching details:', error);
     dispatch({ type: 'GET_DETAILS_FAILURE', payload: error.message });
   }
 };
 export const createGame = (gameData) => {
-  return async (dispatch) => {
+  return async () => {
     try {
       const response = await axios.post('/videogames', gameData);
-      const newGame = response.data.videogame;
+      const newVideoGame = response.data.videogame;
       
-      return newGame;
+      return newVideoGame;
     } catch (error) {
       console.error('Error al crear el juego:', error);
       throw error;

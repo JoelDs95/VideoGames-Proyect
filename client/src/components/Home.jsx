@@ -11,16 +11,17 @@ const Home = ({ videogames, getVideoGames, getGenres, fetchGenres }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [gamesPerPage, setGamesPerPage] = useState(15);
   const [sortBy, setSortBy] = useState("");
-  const [genreFilter, setGenreFilter] = useState(""); // Estado para el filtro de género
-  const genres = useSelector(state => state.genres);
+  const [genreFilter, setGenreFilter] = useState("");
   // const [platformFilter, setPlatformFilter] = useState(null);
+  const genres = useSelector(state => state.genres);
 
   useEffect(() => {
     // console.log("currentPage:", currentPage);
     getGenres(); 
     fetchGenres();
-    getVideoGames(currentPage); // Disparar la acción para obtener los videojuegos con los parámetros de paginación
-  }, [currentPage, fetchGenres, getVideoGames]); 
+    console.log("genres", fetchGenres());
+    getVideoGames(currentPage); 
+  }, [currentPage, getVideoGames]); 
 
   const getCurrentGames = () => {
     let filteredGames = [...videogames]; 
@@ -31,12 +32,13 @@ const Home = ({ videogames, getVideoGames, getGenres, fetchGenres }) => {
     //   filteredGames = filteredGames.filter(game => game.platforms.includes(platformFilter));
     // }
     
+
+    //Ordennamiento
     if (sortBy) { 
-      // Aplicar ordenamiento si se ha seleccionado una opción
       if (sortBy === 'name') {
         filteredGames.sort((a, b) => a.name.localeCompare(b.name));
-      } else if (sortBy === 'releaseDate') {
-        filteredGames.sort((a, b) => new Date(a.releaseDate) - new Date(b.releaseDate));
+      } else if (sortBy === 'released') {
+        filteredGames.sort((a, b) => new Date(a.released) - new Date(b.released));
       } else if (sortBy === 'rating') {
         filteredGames.sort((a, b) => b.rating - a.rating);
       }
@@ -50,7 +52,7 @@ const Home = ({ videogames, getVideoGames, getGenres, fetchGenres }) => {
   };
   const handleGamesPerPageChange = (perPage) => {
     setGamesPerPage(perPage);
-    setCurrentPage(1); // Resetear a la primera página cuando se cambia el número de juegos por página
+    setCurrentPage(1);
   };
   const handleSortChange = (event) => {
     const newSortBy = event.target.value;
@@ -81,12 +83,14 @@ const Home = ({ videogames, getVideoGames, getGenres, fetchGenres }) => {
         <option value={50}>50</option>
         <option value={100}>100</option>
       </select>
-      <select value={sortBy} onChange={handleSortChange}> {/* Select para elegir el tipo de ordenamiento */}
+
+      <select value={sortBy} onChange={handleSortChange}> 
         <option value="">Ordenar por...</option>
         <option value="name">Nombre</option>
-        <option value="releaseDate">Fecha de Lanzamiento</option>
+        <option value="released">Lanzamiento</option>
         <option value="rating">Rating</option>
       </select>
+
       <select value={genreFilter} onChange={handleGenreChange}>
         <option value="">Género...</option>
         {genres.map((genre) => (
@@ -109,6 +113,7 @@ const Home = ({ videogames, getVideoGames, getGenres, fetchGenres }) => {
             />
           ))}
       </div>
+      <br />
       <Paginator
         currentPage={currentPage}
         totalPages={Math.ceil(videogames.length / gamesPerPage)}

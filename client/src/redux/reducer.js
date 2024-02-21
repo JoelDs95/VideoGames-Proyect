@@ -2,13 +2,13 @@ const initialState = {
   videogames: [],
   allVideogames: [],
   genres: [],
-  detail: {},
+  detail: [],
   loading: true,
-  platforms: [],
   error: null
 };
 
 function rootReducer(state = initialState, action) {
+  console.log('Estado inicial:', state);
   switch (action.type) {
     case 'GET_VIDEOGAMES':
       return {
@@ -29,46 +29,16 @@ function rootReducer(state = initialState, action) {
         genres: action.payload
       };
 
-    case 'POST_VIDEOGAME':
+    case 'FETCH_GENRES_SUCCESS':
       return {
         ...state,
+        genres: action.payload,
       };
 
-    case 'FILTER_BY_GENRE':
-      const allGames = state.videogames;
-      const genresFiltered = action.payload === 'All' ?
-        state.allVideogames
-        : allGames.filter(el => el.genres.find(el => el.name === action.payload));
+    case 'FETCH_GENRES_FAILURE':
       return {
         ...state,
-        videogames: genresFiltered
-      };
-
-    case 'FILTER_CREATED':
-      const filterCreated = action.payload === 'Created' ?
-        state.allVideogames.filter(el => el.createdInDb)
-        : state.allVideogames.filter(el => !el.createdInDb)
-      return {
-        ...state,
-        videogames: action.payload === 'All' ? state.allVideogames : filterCreated
-      };
-
-    case 'ORDER_BY_NAME':
-      let sortName = action.payload === 'Asc' ?
-        state.videogames.sort((a, b) => a.name.localeCompare(b.name))
-        : state.videogames.sort((a, b) => b.name.localeCompare(a.name));
-      return {
-        ...state,
-        videogames: sortName,
-      };
-
-    case 'ORDER_BY_RATING':
-      let sortRating = action.payload === 'Low' ?
-        state.videogames.sort((a, b) => a.rating - b.rating)
-        : state.videogames.sort((a, b) => b.rating - a.rating);
-      return {
-        ...state,
-        videogames: sortRating,
+        error: action.payload
       };
 
     case 'GET_DETAILS':
@@ -86,7 +56,7 @@ function rootReducer(state = initialState, action) {
     case 'GET_DETAILS_FAILURE':
       return {
         ...state,
-        detail: {} // O alguna otra lógica de manejo de errores
+        error: action.payload
       };
 
     default:

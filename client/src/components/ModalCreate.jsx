@@ -105,7 +105,7 @@ const ModalCreate = ({ isOpen, closeModal }) => {
             <h2>Crear Nuevo Videojuego</h2>
             <div className={styles.formContainer}>
               <div className={styles.formGroup}>
-                <label>Nombre:</label>
+                <label className={styles.labelCenter}>Nombre:</label>
                 <input
                   type="text"
                   value={name}
@@ -115,7 +115,7 @@ const ModalCreate = ({ isOpen, closeModal }) => {
                 {nameError && <p className={styles.error}>{nameError}</p>}
               </div>
               <div className={styles.formGroup}>
-                <label>Descripción:</label>
+                <label className={styles.labelCenter}>Descripción:</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -124,7 +124,7 @@ const ModalCreate = ({ isOpen, closeModal }) => {
                 {descriptionError && <p className={styles.error}>{descriptionError}</p>}
               </div>
               <div className={styles.formGroup}>
-                <label>Plataformas:</label>
+                <label className={styles.labelCenter}>Plataformas:</label>
                 <input
                   type="text"
                   value={platforms}
@@ -134,7 +134,7 @@ const ModalCreate = ({ isOpen, closeModal }) => {
                 {platformError && <p className={styles.error}>{platformError}</p>}
               </div>
               <div className={styles.formGroup}>
-                <label>Imagen:</label>
+                <label className={styles.labelCenter}>Imagen:</label>
                 <input
                   type="text"
                   value={image}
@@ -153,7 +153,7 @@ const ModalCreate = ({ isOpen, closeModal }) => {
                 )}
               </div>
               <div className={styles.formGroup}>
-                <label>Géneros:</label>
+                <label className={styles.labelCenter}>Géneros:</label>
                 <div className={styles.multiselect}>
                   <input
                     type="text"
@@ -183,8 +183,10 @@ const ModalCreate = ({ isOpen, closeModal }) => {
                 </div>
               </div>
               <div className={styles.formGroup}>
+                  <label className={styles.label}>Lanzamiento:</label>
+                  <label className={styles.label}>Rating:</label>
                 <div className={styles.inputContainer}>
-                  <label>Fecha de Lanzamiento:</label>
+                  <br />
                   <input
                     type="date"
                     value={released}
@@ -192,9 +194,8 @@ const ModalCreate = ({ isOpen, closeModal }) => {
                     className={styles.inputDate}
                   />
                   {releasedError && <p className={styles.error}>{releasedError}</p>}
-                </div>
-                <div className={styles.inputContainer}>
-                  <label>Rating:</label>
+                  <br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   <input
                     type="number"
                     value={rating}

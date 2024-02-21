@@ -1,22 +1,20 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { getVideoGameByName } from '../../redux/actions'; // Importa la acción
+import { getVideoGameByName } from '../../redux/actions'; 
 
 const SearchBar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const dispatch = useDispatch();
 
   const handleSearch = () => {
-    dispatch(getVideoGameByName(searchQuery)); // Llama a la acción para buscar juegos por nombre
+    dispatch(getVideoGameByName(searchQuery));
   };
-
   const handleChange = (e) => {
-    setSearchQuery(e.target.value); // Actualiza el estado con el valor del input
+    setSearchQuery(e.target.value); 
   };
-
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
-      handleSearch(); // Llama a la función de búsqueda si se presiona Enter
+      handleSearch();
     }
   };
 

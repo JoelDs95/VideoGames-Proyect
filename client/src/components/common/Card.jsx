@@ -10,11 +10,9 @@ const Card = ({ id, name, image, genres }) => {
         <Link to={`/detail/${id}`}>
           <h2 className={styles.name}>{name}</h2>
         </Link>
-        {genres && genres.length > 0 && (
-          <p className={styles.genres}>
-            <strong>Géneros:</strong> {genres.join(", ")}
-          </p>
-        )}
+        {genres && genres.length > 0 && (<p className={styles.genres}>
+          <strong>Géneros:</strong> {genres.join(", ")}
+        </p>)}
       </div>
     </div>
   );

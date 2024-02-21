@@ -1,7 +1,4 @@
-// Paginator.jsx
-
 import React from 'react';
-import styles from './Paginator.module.css';
 
 const Paginator = ({ currentPage, totalPages, onPageChange }) => {
   const pageNumbers = [];
@@ -15,7 +12,7 @@ const Paginator = ({ currentPage, totalPages, onPageChange }) => {
         <button
           key={number}
           onClick={() => onPageChange(number)}
-          className={currentPage === number ? styles.active : styles.pageNumber}
+          className={currentPage === number}
         >
           {number}
         </button>
@@ -28,24 +25,21 @@ const Paginator = ({ currentPage, totalPages, onPageChange }) => {
         <>
           <button
             onClick={() => onPageChange(1)}
-            className={currentPage === 1 ? styles.active : styles.pageNumber}
           >
             1
           </button>
-          {currentPage > 4 && <span className={styles.ellipsis}>...</span>}
+          {currentPage > 4 && <span>...</span>}
           {pageNumbers.slice(firstPage, lastPage + 1).map(number => (
             <button
               key={number}
               onClick={() => onPageChange(number)}
-              className={currentPage === number ? styles.active : styles.pageNumber}
             >
               {number}
             </button>
           ))}
-          {currentPage < totalPages - 3 && <span className={styles.ellipsis}>...</span>}
+          {currentPage < totalPages - 3 && <span >...</span>}
           <button
             onClick={() => onPageChange(totalPages)}
-            className={currentPage === totalPages ? styles.active : styles.pageNumber}
           >
             {totalPages}
           </button>
@@ -55,10 +49,10 @@ const Paginator = ({ currentPage, totalPages, onPageChange }) => {
   };
 
   return (
-    <div className={styles.paginatorContainer}>
-      <div className={styles.paginatorButtonContainer}>
+    <div >
+      
         {renderPageNumbers()}
-      </div>
+      
     </div>
   );
 };

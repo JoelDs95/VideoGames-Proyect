@@ -17,7 +17,7 @@
     padding: 20px;
     border-radius: 8px;
     width: 450px;
-    height: 850px;
+    height: 800px;
   }
   
   .formContainer {
@@ -28,13 +28,15 @@
   .formGroup {
     margin-bottom: 10px;
   }
-  .formGroupDate {
-    margin-bottom: 10px;
-  }
-  
+
   .label {
     font-weight: bold;
-    font-size: 16px;
+    font-size: 18px;
+    margin-right: 110px;
+  }
+  .labelCenter {
+    font-weight: bold;
+    font-size: 18px;
   }
   
   .input {
@@ -46,17 +48,18 @@
   }
   .inputContainer {
     display: flex;
-    flex-direction: column;
-    margin-right: 20px; /* Espacio entre los inputs */
-  }
+    flex-direction: row;
+    }
   
   .inputDate {
-    width: 35%;
+    width: 34%;
     padding: 10px;
     border: 2px solid #000;
     border-radius: 5px;
     font-size: 16px;
-    margin-top: 5px; /* Espacio entre el label y el input */
+    margin-top: 10px;
+    margin-right: 50px;
+    
   }
   
   
@@ -145,8 +148,9 @@
     color: white; /* Color del texto del botón */
     border: none;
     border-radius: 4px;
-    padding: 6px 8px;
+    padding: 12px 14px;
     cursor: pointer;
+    margin-top: 80px;
   }
   
   .modal button:hover {

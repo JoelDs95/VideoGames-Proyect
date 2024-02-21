@@ -12,46 +12,46 @@ let videogamesCache = null;
 
 router.get('/', async (req, res) => {
   try {
-    let formattedVideoGamesDB;
+    let formattedGamesDb;
 
     const videoGamesDB = await Videogame.findAll({
       include: [{
         model: Genre,
         attributes: ['name'],
-        through: { attributes: [] }
+        through: { attributes: [] } // evitar incluir algun otro atributo adicional de la tabla relacionada...  
       }]
     });
 
-    formattedVideoGamesDB = videoGamesDB.map(game => {
+    formattedGamesDb = videoGamesDB.map(game => {
       const genres = game.genres.map(genre => genre.name);
       return { ...game.toJSON(), genres };
     });
 
-    // Comprobar si hay datos en el caché
+    // Comprobar si hay datos en el caché para combinar con los datos de la Db
     if (videogamesCache && videogamesCache.length > 0) {
       console.log('Obteniendo datos desde el caché...');
-      const combinedVideoGames = [...formattedVideoGamesDB, ...videogamesCache];
+      const combinedVideoGames = [...formattedGamesDb, ...videogamesCache];
       return res.json(combinedVideoGames);
     }
-
-    const totalPages = 50;
-    const batchSize = 10;
+    const totalPages = 100;
+    const qtySize = 20;
     const allVideoGames = [];
 
     // Bucle para recorrer en lotes de 10 páginas
-    for (let batch = 0; batch < totalPages / batchSize; batch++) {
-      const pageStart = batch * batchSize + 1;
-      const pageEnd = (batch + 1) * batchSize;
+    for (let qty = 0; qty < totalPages / qtySize; qty++) {
+      const pageStart = qty * qtySize + 1;
+      const pageEnd = (qty + 1) * qtySize;
       const requests = [];
+      // console.log(pageStart, pageEnd)
 
       for (let page = pageStart; page <= pageEnd; page++) {
         const url = `${RAWG_BASE_URL}/games?key=${RAWG_API_KEY}&page=${page}`;
         requests.push(axios.get(url));
+        // console.log(url)
       }
-
       const responses = await Promise.all(requests);
 
-      // Procesar las respuestas y extraer los datos necesarios
+      // Manejo de la respuesta y extracion de datos necesarios
       responses.forEach((response) => {
         const videogames = response.data.results.map((result) => {
           return {
@@ -74,7 +74,7 @@ router.get('/', async (req, res) => {
     // Guardar en caché
     videogamesCache = allVideoGames;
 
-    const combinedVideoGames = [...formattedVideoGamesDB, ...allVideoGames];
+    const combinedVideoGames = [...formattedGamesDb, ...allVideoGames];
     res.json(combinedVideoGames);
   } catch (error) {
     console.error(error);
@@ -87,7 +87,7 @@ router.get('/name', async (req, res) => {
     const { query } = req.query;
     const searchQuery = query.toLowerCase();
 
-    const regexQuery = `^${searchQuery}$`; // Expresión regular para coincidencia exacta
+    const regexQuery = `^${searchQuery}$`; // Expresión regular para coincidencia
 
     const dbResults = await Videogame.findAll({
       where: {
@@ -106,10 +106,10 @@ router.get('/name', async (req, res) => {
       const genres = game.genres.map(genre => genre.name);
       return { ...game.toJSON(), genres };
     });
-
-    // Paso 2: Consulta a la API externa si no se encuentran suficientes resultados en la base de datos
     let combinedResults = formattedDbResults;
-
+    
+    // Si la db tiene menos de 15 coincidencias continuamos a realizar 
+    //la busqueda por la api para completar los 15 resultados
     if (formattedDbResults.length < 15) {
       const apiResults = await axios.get(
         `${RAWG_BASE_URL}/games?key=${RAWG_API_KEY}&search=${searchQuery}`
@@ -127,11 +127,9 @@ router.get('/name', async (req, res) => {
         };
       });
 
-      // Combina los resultados de la base de datos y la API externa
+      // Combino resultados db y api
       combinedResults = [...formattedDbResults, ...apiGames.slice(0, 15 - formattedDbResults.length)];
     }
-
-    // Paso 3: Devuelve los resultados combinados al cliente
     res.json(combinedResults);
   } catch (error) {
     console.error(error);
@@ -143,9 +141,9 @@ router.get('/:idVideogame', async (req, res) => {
   try {
     const { idVideogame } = req.params;
 
-    // Verificar si el videojuego está en el caché
+    // El videojuego esta en cache?
     if (videogamesCache) {
-      const cachedVideogame = videogamesCache.find(vg => vg.id === +idVideogame);
+      const cachedVideogame = videogamesCache.find(vgCache => vgCache.id === +idVideogame);
 
       if (cachedVideogame) {
         console.log('Obteniendo detalle del videojuego desde el caché...');
@@ -153,7 +151,7 @@ router.get('/:idVideogame', async (req, res) => {
       }
     }
 
-    // Verificar si el videojuego está en la base de datos
+    // El videojuego está en Db?
     const dbVideogame = await Videogame.findByPk(idVideogame, {
       include: Genre,
     });
@@ -172,7 +170,7 @@ router.get('/:idVideogame', async (req, res) => {
       return res.json(formattedDbResult);
     }
 
-    // Si no está en la base de datos, consultarlo a la API
+    // Si no esta en las consultas anteriores, consultarlo a la Api Ejemplo ID = "945852"
     const apiResponse = await axios.get(`${RAWG_BASE_URL}/games/${idVideogame}?key=${RAWG_API_KEY}`);
     const apiVideogame = apiResponse.data;
 
@@ -198,7 +196,6 @@ router.get('/:idVideogame', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    // Extraer datos del cuerpo de la solicitud
     const { name, description, platforms, image, released, rating, genres } = req.body;
 
     // Validar que se proporcionen al menos un género
@@ -206,7 +203,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Debes proporcionar al menos un género' });
     }
 
-    // Crear el videojuego en la base de datos
+    //Creacion y coincidencia de generos... 
     const newVideoGame = await Videogame.create({
       name,
       description,
@@ -215,14 +212,11 @@ router.post('/', async (req, res) => {
       released,
       rating,
     });
-
     const genreInstances = await Genre.findAll({
-      where: { id: genres } // Supongo que el nombre del género coincide con el array de géneros que tienes
+      where: { id: genres }
     });
-    
-    // Relacionar el videojuego con los géneros proporcionados
     await newVideoGame.addGenres(genreInstances);
-
+    
     res.status(201).json({ message: 'Videojuego creado exitosamente', videogame: newVideoGame });
   } catch (error) {
     console.error(error);
