@@ -10,7 +10,7 @@ export const getVideoGames = () => async (dispatch) => {
     console.error('Error fetching video games:', error);
   }
 };
-//obtener nombre
+//obtener por nombre
 export const getVideoGameByName = (name) => async (dispatch) => {
   try {
     const url = `/videogames/name?query=${name}`;
@@ -21,7 +21,7 @@ export const getVideoGameByName = (name) => async (dispatch) => {
   }
 };
 
-//géneros APO
+//generos APO
 export const getGenres = () => async (dispatch) => {
   try {
     const response = await axios.get('/genres');
@@ -30,7 +30,7 @@ export const getGenres = () => async (dispatch) => {
     console.error('Error fetching genres:', error);
   }
 };
-// Action para obtener los géneros DB
+//obtener los generos DB
 export const fetchGenres = () => {
   return async (dispatch) => {
     try {
@@ -43,6 +43,7 @@ export const fetchGenres = () => {
   };
 };
 
+//obtener detalles
 export const getDetails = (id) => async (dispatch) => {
   try {
     const response = await axios.get(`/videogames/${id}`);
@@ -52,6 +53,7 @@ export const getDetails = (id) => async (dispatch) => {
     dispatch({ type: 'GET_DETAILS_FAILURE', payload: error.message });
   }
 };
+//crear juego nuevo
 export const createGame = (gameData) => {
   return async () => {
     try {

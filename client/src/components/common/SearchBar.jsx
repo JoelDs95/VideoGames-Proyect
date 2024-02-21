@@ -17,7 +17,6 @@ const SearchBar = () => {
       handleSearch();
     }
   };
-
   return (
     <div style={{ width: '35%', margin: '0 auto', marginTop: '20px', position: 'relative' }}>
       <input

@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "./Card.module.css"; // Importa los estilos CSS como un objeto de módulo
+import styles from "./Card.module.css";
 import { Link } from "react-router-dom";
 
 const Card = ({ id, name, image, genres }) => {

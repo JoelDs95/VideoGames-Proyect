@@ -5,15 +5,10 @@ const Paginator = ({ currentPage, totalPages, onPageChange }) => {
   for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i);
   }
-
   const renderPageNumbers = () => {
-    if (totalPages <= 7) {
+    if (totalPages <= 10) {
       return pageNumbers.map(number => (
-        <button
-          key={number}
-          onClick={() => onPageChange(number)}
-          className={currentPage === number}
-        >
+        <button key={number} onClick={() => onPageChange(number)}>
           {number}
         </button>
       ));
@@ -23,24 +18,17 @@ const Paginator = ({ currentPage, totalPages, onPageChange }) => {
 
       return (
         <>
-          <button
-            onClick={() => onPageChange(1)}
-          >
+          <button onClick={() => onPageChange(1)}>
             1
           </button>
-          {currentPage > 4 && <span>...</span>}
+          {currentPage > 4 && <span>.....</span>}
           {pageNumbers.slice(firstPage, lastPage + 1).map(number => (
-            <button
-              key={number}
-              onClick={() => onPageChange(number)}
-            >
+            <button key={number} onClick={() => onPageChange(number)}>
               {number}
             </button>
           ))}
-          {currentPage < totalPages - 3 && <span >...</span>}
-          <button
-            onClick={() => onPageChange(totalPages)}
-          >
+          {currentPage < totalPages - 3 && <span >.....</span>}
+          <button onClick={() => onPageChange(totalPages)}>
             {totalPages}
           </button>
         </>

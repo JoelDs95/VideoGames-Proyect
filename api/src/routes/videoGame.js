@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
       include: [{
         model: Genre,
         attributes: ['name'],
-        through: { attributes: [] } // evitar incluir algun otro atributo adicional de la tabla relacionada...  
+        through: { attributes: [] } 
       }]
     });
 
@@ -37,13 +37,14 @@ router.get('/', async (req, res) => {
     const qtySize = 20;
     const allVideoGames = [];
 
-    // Bucle para recorrer en lotes de 10 páginas
+    // Bucle para recorrer en lotes de 20 páginas
     for (let qty = 0; qty < totalPages / qtySize; qty++) {
       const pageStart = qty * qtySize + 1;
       const pageEnd = (qty + 1) * qtySize;
       const requests = [];
       // console.log(pageStart, pageEnd)
 
+      //bucle interno que recorrera el endpoint
       for (let page = pageStart; page <= pageEnd; page++) {
         const url = `${RAWG_BASE_URL}/games?key=${RAWG_API_KEY}&page=${page}`;
         requests.push(axios.get(url));

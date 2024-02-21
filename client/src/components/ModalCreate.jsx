@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createGame, fetchGenres } from "../redux/actions";
-import styles from "./ModalCreate.module.css"; // Importa los estilos del modal
+import styles from "./ModalCreate.module.css";
 
 const ModalCreate = ({ isOpen, closeModal }) => {
   const [selectedGenres, setSelectedGenres] = useState([]);
@@ -90,7 +90,7 @@ const ModalCreate = ({ isOpen, closeModal }) => {
         genres: selectedGenres.map((genre) => genre.id),
       };
       await dispatch(createGame(gameData));
-      closeModal(); // Cierra el modal después de enviar el formulario
+      closeModal();
     } catch (error) {
       console.error("Error al enviar formulario:", error);
       alert("Error al enviar formulario");
